@@ -20,6 +20,7 @@
     <li><a href="#data-sources-transfer">Data Sources, Transfer and Load</a></li>
     <li><a href="#data-analysis">Data Analysis</a></li>
     <li><a href="#built-with">Built With</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
   </ol>
 </details>
 
@@ -27,70 +28,72 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Project: Training and education\
-Status: Proof of concept (PoC)
+Sponsor / client: Large communication, IT and entertainment company\
+Status: Test
 
 Scope:\
-A central scheduling system carries out batch processing for many customers (end-of-day processing, file transfers, automated software installations, etc.). More than 1.1 million such batch runs are executed every day. The runtimes of these batch jobs are partially saved, but only used sporadically for further analysis. 
+A central scheduling system submits batch jobs for many customers (end-of-day processing, file transfers, automated software installations, etc.). More than 1.1 million such batch runs are executed every day. The runtimes of these batch jobs are partially saved, but only used sporadically for further analysis. 
 
-Goals:\
+Goals:
 - Collect runtime data and transfer it to a suitable system for storage and further processing
 - Identify use cases to help optimize operations, increase customer satisfaction or create additional customer services
 - Analyzing and evaluating data and visualizing it in a useful way
 
 
 ## Data Sources, Transfer and Load
-A cluster with five nodes (bd-1 to bd-5) is set up for this PoC. The server infrastructure is provided by SWITCHengines. The individual nodes are small in terms of performance and storage and would not be suitable for a real big data project.
+Raw data is extracted from the following systems:
+- Core application
+- Scheduling system
+- Atlassian Jira
 
-<img src="https://github.com/0LIFR1/big-data-run-time-analytics/blob/main/data_sources.png" width=60% height=60%>
+<img src="https://github.com/0LIFR1/big-data-run-time-analytics/blob/main/data_sources.png">
 
+Data has to be transferred to the existing big data platform where it can be imported into HDFS
 
-<img src="https://github.com/0LIFR1/big-data-run-time-analytics/blob/main/data_transfer.png" width=60% height=60%>
-
-
-The following components are installed and configured:
-
-* bd-1:
-  * HDFS NameNode
-  * HDFS ResourceManager
-  * HDFS SecondaryNameNode
-  * HDFS NodeManager
-  * HDFS DataNode
-  * SparkMaster
-* bd-2:
-  * SparkWorker Zeppelin
-* bd-3:
-  * HDFS DataNode
-  * SparkWorker
-  * Cassandra (seed provider and seed node)
-* bd-4:
-  * HDFS DataNode
-  * SparkWorker
-  * Cassandra (seed node)
-* bd-5:
-  * HDFS DataNode
-  * SparkWorker
-  * Cassandra (seed node)
+<img src="https://github.com/0LIFR1/big-data-run-time-analytics/blob/main/data_transfer.png">
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Data Analysis
-Workflow:
-- User transfers csv file from client to cluster (ssh)
-- On the cluster, the data is loaded into the HDFS and/or imported into Cassandra
-- Data can be written to a socket via a streaming generator and read from there using Spark structured streaming
-- Analysis and evaluation using Zeppelin notebooks. Data can be loaded via Spark or HDFS using the corresponding interpreters
+To start with, two use cases have been identified.
 
-<img src="https://github.com/0LIFR1/hadoop-data-lake/blob/main/data_lake_architecture.png" width=60% height=60%>
+### Use Case 1 - End of Period Analysis
+The master schedule is a workflow in the scheduling system that contains all batch jobs of the end-of-day processing on the core system. This use case is intended to show runtime changes for the entire end-of-day processing, taking into account the maintenance activities carried out on the core applications (e.g. deployment of a new release) and the company-wide maintenance windows (e.g. firewall or storage changes).
+
+Main tasks:
+- Load csv files
+- Data selection and various data conversions
+- Joining data sets
+- Visualize data
+- Analyze result
+
+### Use Case 2 - Slow Poison
+A sudden and significant runtime increase of a batch job raises alerts through the monitoring application. But there are batch processes with a small but regular runtime increase that are not detected or only detected by chance. Over a long period of time, such jobs may lead to operational issues. The aim of this use case is to systematically identify such processes so that they can be investigated early.
+
+Main tasks:
+- Define overall concept and criterias
+  - Median is used to calculate the average runtime because it is more robust against outliers
+  - Current quarter is compared with the three previous quarters
+  - At least three successful executions per batch job and quarter (for median calculation)
+  - Runtime between two quarters must increase by at least 3%. This increase must also exist between all compared quarters
+  - Median per job in the current quarter must be at least 600 seconds (shorter runtimes have too little of an effect)
+- Load csv files
+- Data selection and various data conversions
+- Filter data according to criterias
+- Various data aggregations
+- Pivoting
+- Visualize data
+
+Sample:
+
+<img src="https://github.com/0LIFR1/big-data-run-time-analytics/blob/main/slow_poison_anon.png">
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- BUILT WITH -->
 ## Built With
 
-[![Linux][linux-shield]][linux-url]\
-[![Apache Hadoop][apache-shield]][apache-url] [![Spark][spark-shield]][spark-url] [![Cassandra][cassandra-shield]][cassandra-url]\
-[![Python][python-shield]][python-url] [![Pandas][pandas-shield]][pandas-url] [![Numpy][numpy-shield]][numpy-url] [![Matplotlib][matplotlib-shield]][matplotlib-url]
+[![Apache Hadoop][apache-hadoop-shield]][apache-hadoop-url] [![Spark][spark-shield]][spark-url]\
+[![Python][python-shield]][python-url] [![Pandas][pandas-shield]][pandas-url] [![Matplotlib][matplotlib-shield]][matplotlib-url]
 
 <!-- Logo examples
 <div>
@@ -101,6 +104,11 @@ Workflow:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Roadmap
+There is still room for improvement :-), some ideas:
+- Automate data pipeline
+- Optimize some of the code
+- Make visualisations look nicer (e.g. usage of Tableau)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
@@ -118,7 +126,7 @@ Workflow:
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: images/screenshot.png
 [linux-shield]: https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black
-[linux-url]: https://www.linux.org/ 
+[linux-url]: https://www.linux.org/
 [rstudio-shield]: https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white
 [rstudio-url]: https://posit.co/
 [jupyter-shield]: https://img.shields.io/badge/Jupyter-F37626.svg?&style=for-the-badge&logo=Jupyter&logoColor=white
@@ -127,8 +135,8 @@ Workflow:
 [python-url]: https://www.python.org/
 [scikit-learn-shield]: https://img.shields.io/badge/scikit_learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white
 [scikit-learn-url]: https://scikit-learn.org/stable/
-[apache-shield]: https://img.shields.io/badge/Apache-D22128?style=for-the-badge&logo=Apache&logoColor=white
-[apache-url]: https://hadoop.apache.org/
+[apache-hadoop-shield]: https://img.shields.io/badge/Apache%20Hadoop-6CF?logo=apachehadoop&logoColor=fff&style=for-the-badge
+[apache-hadoop-url]: https://hadoop.apache.org/
 [spark-shield]: https://img.shields.io/badge/Apache_Spark-FFFFFF?style=for-the-badge&logo=apachespark&logoColor=#E35A16
 [spark-url]: https://spark.apache.org/
 [cassandra-shield]: https://img.shields.io/badge/Cassandra-1287B1?style=for-the-badge&logo=apache%20cassandra&logoColor=white

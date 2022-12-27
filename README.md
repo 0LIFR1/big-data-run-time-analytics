@@ -31,7 +31,7 @@
 Sponsor / client: Large communication, IT and entertainment company<br>
 Status: Test
 
-**Scope**:<br>
+**Summary**:<br>
 A central scheduling system submits batch jobs for many customers (end-of-day processing, file transfers, automated software installations, etc.). More than 1.1 million such batch runs are executed every day. The runtimes of these batch jobs are partially saved, but only used sporadically for further analysis. 
 
 Goals:

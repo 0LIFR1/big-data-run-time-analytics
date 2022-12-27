@@ -1,4 +1,4 @@
-# Batch processing run-time analytics
+# Batch processing runtime analytics
 
 <a name="readme-top"></a>
 
